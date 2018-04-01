@@ -1,0 +1,446 @@
+<html>
+<head>
+	<style>
+		#mainBoard{
+			width:420px;
+			height:420px;
+			border:1px solid white;
+		}
+
+		div{
+			width:50px;
+			height:50px;
+			float:left;
+			border:1px solid white;
+		}
+
+		.whiteDot {
+			height: 45px;
+			width: 45px;
+			margin: 2px;
+			background-color: #fff;
+			border-radius: 50%;
+			display: inline-block;
+		}
+		
+		.blackDot {
+			height: 45px;
+			width: 45px;
+			margin: 2px;
+			background-color: #000;
+			border-radius: 50%;
+			display: inline-block;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="mainBoard"></div>
+	<table>
+		<tr>
+			<td><b>Chance:</b></td>
+			<td id = "chance"></td>
+		</tr>
+		<tr>
+			<td><b>Black:</b></td>
+			<td id = "blackPoints"></td>
+		</tr>
+		<tr>
+			<td><b>White:</b></td>
+			<td id = "whitePoints"></td>
+		</tr>
+	</table>
+</body>
+<script>
+function addWhiteDot(id){
+	var div = document.getElementById(id);
+	var dot = document.createElement("span");
+	dot.className = "whiteDot";
+	div.appendChild(dot);
+}
+
+function addBlackDot(id){
+	var div = document.getElementById(id);
+	var dot = document.createElement("span");
+	dot.className = "blackDot";
+	div.appendChild(dot);
+}
+
+function changeChance(){
+	if (chance=="Black"){
+		chance = "White";
+	}
+	else{
+		chance = "Black";
+	}
+}
+
+function addDot(id){
+	var notEmpty = validateEmpty(id);
+	var direction = validateLegal(id);
+	if(direction.length == 0){
+		var legalMove = false;
+	}
+	else{
+		var legalMove = true;
+	}
+	var row = parseInt(id[0]);
+	var col = parseInt(id[2]);
+	if(notEmpty && legalMove){
+		if(chance == "Black"){
+			addBlackDot(id);
+		}
+		else{
+			addWhiteDot(id);
+		}
+		console.log(direction);
+		for(var i = 0; i < direction.length; i++){
+			for(var j = 1; j < 8; j++){
+				if(direction[i] == "up"){
+					var temp = (row-j) + "-" + col;
+					if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+						if(getColor(temp) == chance){
+							break;
+						}
+						if(getColor(temp) != chance && getColor(temp) != "Empty"){
+							reverseColor(temp);
+						}
+					}
+				}
+				else if(direction[i] == "upright"){
+					var temp = (row-j) + "-" + (col+j);
+					if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+						if(getColor(temp) == chance){
+							break;
+						}
+						if(getColor(temp) != chance && getColor(temp) != "Empty"){
+							reverseColor(temp);
+						}
+					}
+				}
+				else if(direction[i] == "right"){
+					var temp = (row) + "-" + (col+j);
+					if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+						if(getColor(temp) == chance){
+							break;
+						}
+						if(getColor(temp) != chance && getColor(temp) != "Empty"){
+							reverseColor(temp);
+						}
+					}
+				}
+				else if(direction[i] == "downright"){
+					var temp = (row+j) + "-" + (col+j);
+					if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+						if(getColor(temp) == chance){
+							break;
+						}
+						if(getColor(temp) != chance && getColor(temp) != "Empty"){
+							reverseColor(temp);
+						}
+					}
+				}
+				else if(direction[i] == "down"){
+					var temp = (row+j) + "-" + (col);
+					if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+						if(getColor(temp) == chance){
+							break;
+						}
+						if(getColor(temp) != chance && getColor(temp) != "Empty"){
+							reverseColor(temp);
+						}
+					}
+				}
+				else if(direction[i] == "downleft"){
+					var temp = (row+j) + "-" + (col-j);
+					if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+						if(getColor(temp) == chance){
+							break;
+						}
+						if(getColor(temp) != chance && getColor(temp) != "Empty"){
+							reverseColor(temp);
+						}
+					}
+				}
+				else if(direction[i] == "left"){
+					var temp = (row) + "-" + (col-j);
+					if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+						if(getColor(temp) == chance){
+							break;
+						}
+						if(getColor(temp) != chance && getColor(temp) != "Empty"){
+							reverseColor(temp);
+						}
+					}
+				}
+				else if(direction[i] == "upleft"){
+					var temp = (row-j) + "-" + (col-j);
+					if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+						if(getColor(temp) == chance){
+							break;
+						}
+						if(getColor(temp) != chance && getColor(temp) != "Empty"){
+							reverseColor(temp);
+						}
+					}
+				}
+			}
+		}
+		changeChance();
+		document.getElementById("chance").innerHTML = chance;
+		count();
+	}
+	else{
+		alert("Invalid position");
+	}
+	
+}
+
+function reverseColor(id){
+	var col = getColor(id);
+	var element = document.getElementById(id);
+	if (col == "White"){
+		element.childNodes[0].className = "blackDot";
+	}
+	else if (col == "Black"){
+		element.childNodes[0].className = "whiteDot";
+	}
+}
+
+function init(){
+	for (var i = 0; i < 64; i++){
+		var mainBoard = document.getElementById("mainBoard");
+		var element = document.createElement("div");
+		var col = i % 8;
+		var row = parseInt(i/8);
+		element.id = (row+1) + "-" + (col+1);
+		element.addEventListener('click',function(event){
+			addDot(this.id);
+		});
+		mainBoard.appendChild(element).style.backgroundColor = 'green';
+	}
+	addWhiteDot("4-4");
+	addWhiteDot("5-5");
+	addBlackDot("5-4");
+	addBlackDot("4-5");
+	chance = "Black";
+	document.getElementById("chance").innerHTML = chance;
+	document.getElementById("blackPoints").innerHTML = 2;
+	document.getElementById("whitePoints").innerHTML = 2;
+}
+
+function validateEmpty(id){
+	var element = document.getElementById(id);
+	if(element.childNodes.length == 0){
+		return true;
+	}
+}
+
+function count(){
+	var black = 0;
+	var white = 0;
+	for(var i = 0; i < 64; i++){
+		var col = i % 8;
+		var row = parseInt(i/8);
+		var id = (row+1) + "-" + (col+1);
+		var element = document.getElementById(id);
+		if(element.childNodes.length != 0){
+			if(element.childNodes[0].className == "whiteDot"){
+				white++;
+			}
+			else if(element.childNodes[0].className == "blackDot"){
+				black++;
+			}
+			else{
+				console.log("What");
+			}
+		}
+	}
+	document.getElementById("blackPoints").innerHTML = black;
+	document.getElementById("whitePoints").innerHTML = white;
+	if(black+white = 64){
+		if(black > white)
+			alert("Black is the winner");
+		else
+			alert("White is the winner");
+	}
+}
+
+function getColor(id){
+	var element = document.getElementById(id);
+	if(element == null || element.childNodes.length == 0){
+		return "Empty";	
+	}
+	var col = element.childNodes[0].className;
+	if (col == "whiteDot"){
+		return "White";
+	}
+	else if (col == "blackDot"){
+		return "Black";
+	}
+	return "Empty";
+}
+
+function onlyUnique(value, index, self) { 
+    return self.indexOf(value) === index;
+}
+
+function validateLegal(id){
+	var validAdjacent = false;
+	var row = parseInt(id[0]);
+	var col = parseInt(id[2]);
+	var adjId = [(row+1)+"-"+(col), (row-1)+"-"+(col), (row)+"-"+(col+1), (row)+"-"+(col-1),
+					(row+1)+"-"+(col+1), (row+1)+"-"+(col-1), (row-1)+"-"+(col+1) ,(row-1)+"-"+(col-1)];
+	var validAdjId = [];
+	/*Create array of adjacent cells*/
+	for(var i = 0; i < adjId.length; i++){
+		var tempCol = parseInt(adjId[i][2]);
+		var tempRow = parseInt(adjId[i][0]);
+		if (tempRow == 9 || tempRow == 0 || tempCol == 9 || tempCol == 0){
+			continue;
+		}
+		validAdjId.push(adjId[i]);
+	}
+	if(chance == "Black"){
+		var searchFor = "White";
+	}
+	else{
+		var searchFor = "Black";
+	}
+	
+	var adjOpp = [];
+	/*Search for adjacent cell with opposite color*/
+	for(var i = 0; i < validAdjId.length; i++){
+		var element = document.getElementById(validAdjId[i]);
+		if(element.childNodes.length != 0){
+			if(element.childNodes[0].className == "whiteDot" && searchFor == "White"){
+				validAdjacent = true;
+				adjOpp.push(validAdjId[i]);
+			}
+			else if(element.childNodes[0].className == "blackDot" && searchFor == "Black"){
+				validAdjacent = true;
+				adjOpp.push(validAdjId[i]);
+			}
+		}		
+	}
+	
+	/*Check in direction for opposite color, if found, push in validDir.*/
+	var dirCheck = [];
+	for(var i = 0; i < adjOpp.length; i++){
+		var tempCol = parseInt(adjOpp[i][2]);
+		var tempRow = parseInt(adjOpp[i][0]);
+		var rowDiff = tempRow - row;
+		var colDiff = tempCol - col;
+		if(rowDiff == -1 && colDiff == 0){dirCheck.push("up");}
+		if(rowDiff == -1 && colDiff == 1){dirCheck.push("upright");}
+		if(rowDiff == 0 && colDiff == 1){dirCheck.push("right");}
+		if(rowDiff == 1 && colDiff == 1){dirCheck.push("downright");}
+		if(rowDiff == 1 && colDiff == 0){dirCheck.push("down");}
+		if(rowDiff == 1 && colDiff == -1){dirCheck.push("downleft");}
+		if(rowDiff == 0 && colDiff == -1){dirCheck.push("left");}
+		if(rowDiff == -1 && colDiff == -1){dirCheck.push("upleft");}
+	}
+	var validDir = [];
+	for(var i = 0; i < dirCheck.length; i++){
+		var checkArr = [];	
+		for(var j = 1; j < 8; j++){
+			//create array of all elements that need to be checked
+			if(dirCheck[i] == "up"){
+				var temp = (row-j) + "-" + col;
+				if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+					checkArr.push(temp);
+					var color = getColor(temp);
+					if(color == chance){
+						validDir.push(dirCheck[i]);
+					}
+				}
+			}
+			else if(dirCheck[i] == "upright"){
+				var temp = (row-j) + "-" + (col+j);
+				if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+					checkArr.push(temp);
+					var color = getColor(temp);
+					if(color == chance){
+						validDir.push(dirCheck[i]);
+					}
+				}
+			}
+			else if(dirCheck[i] == "right"){
+				var temp = (row) + "-" + (col+j);
+				if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+					checkArr.push(temp);
+					var color = getColor(temp);
+					if(color == chance){
+						validDir.push(dirCheck[i]);
+					}
+				}
+			}
+			else if(dirCheck[i] == "downright"){
+				var temp = (row+j) + "-" + (col+j);
+				if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+					checkArr.push(temp);
+					var color = getColor(temp);
+					if(color == chance){
+						validDir.push(dirCheck[i]);
+					}
+				}
+			}
+			else if(dirCheck[i] == "down"){
+				var temp = (row+j) + "-" + (col);
+				if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+					checkArr.push(temp);
+					var color = getColor(temp);
+					if(color == chance){
+						validDir.push(dirCheck[i]);
+					}
+				}
+			}
+			else if(dirCheck[i] == "downleft"){
+				var temp = (row+j) + "-" + (col-j);
+				if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+					checkArr.push(temp);
+					var color = getColor(temp);
+					if(color == chance){
+						validDir.push(dirCheck[i]);
+					}
+				}
+			}
+			else if(dirCheck[i] == "left"){
+				var temp = (row) + "-" + (col-j);
+				if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+					checkArr.push(temp);
+					var color = getColor(temp);
+					if(color == chance){
+						validDir.push(dirCheck[i]);
+					}
+				}
+			}
+			else if(dirCheck[i] == "upleft"){
+				var temp = (row-j) + "-" + (col-j);
+				if(temp[0] > 0 && temp[0] < 9 && temp[2] > 0 && temp[2] < 9){
+					checkArr.push(temp);
+					var color = getColor(temp);
+					if(color == chance){
+						validDir.push(dirCheck[i]);
+					}
+				}
+			}
+		}
+	}
+	validDir = validDir.filter(onlyUnique);
+	if(validDir.length == 0){
+		var validOpp = false;
+	}
+	else{
+		validOpp = true;
+	}
+	if(!validAdjacent || !validOpp){
+		return [];
+	}
+	return validDir;
+}
+
+init();
+
+</script>
+</html>
